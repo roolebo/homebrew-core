@@ -4,7 +4,7 @@ class Gdb < Formula
   url "https://ftp.gnu.org/gnu/gdb/gdb-8.2.tar.xz"
   mirror "https://ftpmirror.gnu.org/gdb/gdb-8.2.tar.xz"
   sha256 "c3a441a29c7c89720b734e5a9c6289c0a06be7e0c76ef538f7bbcef389347c39"
-  revision 1
+  revision 2
 
   bottle do
     sha256 "494641bdd92ccbf9a998943a1ffbdbf77e1970c9234a726727788dacbbf925c0" => :mojave
@@ -61,6 +61,7 @@ class Gdb < Formula
       "--prefix=#{prefix}",
       "--disable-debug",
       "--disable-dependency-tracking",
+      "--disable-binutils",
     ]
 
     args << "--with-guile" if build.with? "guile@2.0"
@@ -86,9 +87,7 @@ class Gdb < Formula
     system "make"
 
     # Don't install bfd or opcodes, as they are provided by binutils
-    inreplace ["bfd/Makefile", "opcodes/Makefile"], /^install:/, "dontinstall:"
-
-    system "make", "install"
+    system "make", "install-gdb"
   end
 
   def caveats; <<~EOS
