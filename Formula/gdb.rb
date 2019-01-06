@@ -1,7 +1,7 @@
 class Gdb < Formula
   desc "GNU debugger"
   homepage "https://www.gnu.org/software/gdb/"
-  revision 2
+  revision 1
   head "git://sourceware.org/git/binutils-gdb.git"
 
   stable do
