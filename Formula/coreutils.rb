@@ -6,10 +6,10 @@ class Coreutils < Formula
   sha256 "e831b3a86091496cdba720411f9748de81507798f6130adeaef872d206e1b057"
 
   bottle do
-    sha256 "45157fb067a46c953bdfcba90de688903b7b3c8fcb39afa1e0b2fef2819eedc5" => :mojave
-    sha256 "77b09dbe66f3d5098998da6babf953e01e828742b8a740a831cc3f3a1f713df7" => :high_sierra
-    sha256 "94844581b7e08ae2d1dc6c77acfd6e95021283cc8b7c1228fed32a423ae826cc" => :sierra
-    sha256 "a5145f88de2525d168ef998f8310d5c0abcead9efee9108fb61c30de91a4869c" => :el_capitan
+    rebuild 1
+    sha256 "6c14c4e69e2c5c17120067fd48c0ba54b949601d3b4f2dfc25f1668e5b367ca2" => :mojave
+    sha256 "5cd709bbc36209bd91cef80fcb871d5121b6e0ac146b38fdbbfafcf71617fddd" => :high_sierra
+    sha256 "a41b91ee571a16aab28996c80891e57ed6c5358d5a7f2ecf6ad13e927e33ea81" => :sierra
   end
 
   head do
@@ -23,8 +23,6 @@ class Coreutils < Formula
     depends_on "wget" => :build
     depends_on "xz" => :build
   end
-
-  depends_on "gmp" => :optional
 
   conflicts_with "ganglia", :because => "both install `gstat` binaries"
   conflicts_with "gegl", :because => "both install `gcut` binaries"
@@ -51,8 +49,8 @@ class Coreutils < Formula
     args = %W[
       --prefix=#{prefix}
       --program-prefix=g
+      --without-gmp
     ]
-    args << "--without-gmp" if build.without? "gmp"
     system "./configure", *args
     system "make", "install"
 
@@ -71,18 +69,14 @@ class Coreutils < Formula
   end
 
   def caveats; <<~EOS
-    All commands have been installed with the prefix 'g'.
-
-    If you really need to use these commands with their normal names, you
+    All commands have been installed with the prefix "g".
+    If you need to use these commands with their normal names, you
     can add a "gnubin" directory to your PATH from your bashrc like:
-
-        PATH="#{opt_libexec}/gnubin:$PATH"
+      PATH="#{opt_libexec}/gnubin:$PATH"
 
     Additionally, you can access their man pages with normal names if you add
     the "gnuman" directory to your MANPATH from your bashrc as well:
-
-        MANPATH="#{opt_libexec}/gnuman:$MANPATH"
-
+      MANPATH="#{opt_libexec}/gnuman:$MANPATH"
   EOS
   end
 

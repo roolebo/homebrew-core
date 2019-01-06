@@ -1,14 +1,15 @@
 class Git < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  url "https://www.kernel.org/pub/software/scm/git/git-2.20.0.tar.xz"
-  sha256 "bc94735073e14b138a1290cc99af3c379d544f514c43f8ebde988fc50d0ad81f"
+  url "https://www.kernel.org/pub/software/scm/git/git-2.20.1.tar.xz"
+  sha256 "9d2e91e2faa2ea61ba0a70201d023b36f54d846314591a002c610ea2ab81c3e9"
   head "https://github.com/git/git.git", :shallow => false
 
   bottle do
-    sha256 "76596d7219afaee57798f67172d4e7e36808e1dead4f6a378ccb15b0ad1dbc38" => :mojave
-    sha256 "29353bfb7faf139d761de5800f4dad0a6599bde3d7629ba8a5c398fc305c52e8" => :high_sierra
-    sha256 "0d76f163e3e1807905d1c2b609560275ee6786e25ffd08ea40118083d3691232" => :sierra
+    rebuild 2
+    sha256 "c41bba2442a795c6d94b24565865811826becd7e3dba0226fe0cab0990ee4bef" => :mojave
+    sha256 "ecf0d2a4663634c7d29c068040a4ded253d8b5e042a2eb4db005c16d221d8275" => :high_sierra
+    sha256 "04b5b0d7bed4a7d2a952f7afbd7df4d93805dd9957047d31344c8bb12d614cc7" => :sierra
   end
 
   depends_on "gettext"
@@ -29,13 +30,18 @@ class Git < Formula
   end
 
   resource "html" do
-    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.20.0.tar.xz"
-    sha256 "a9ad269dff3f8b03d9694308e82c2ea197ef59298d828e10e031bc18aae8913a"
+    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.20.1.tar.xz"
+    sha256 "18a00408437c6816e7c5396c8b96b38bf022f924852492a73dd3888ad2572ad7"
   end
 
   resource "man" do
-    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.20.0.tar.xz"
-    sha256 "79bdaa083528bc59b971131fec9b1ff1abbfcc943b4eb781ff4af5172b103690"
+    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.20.1.tar.xz"
+    sha256 "060acce347cfb712d0c7dfe7578c5291fde2d3d807917b2828c8aae3c90876ba"
+  end
+
+  resource "Net::SMTP::SSL" do
+    url "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Net-SMTP-SSL-1.04.tar.gz"
+    sha256 "7b29c45add19d3d5084b751f7ba89a8e40479a446ce21cfd9cc741e558332a00"
   end
 
   def install
@@ -137,6 +143,11 @@ class Git < Formula
       rm "#{libexec}/git-core/git-imap-send"
     end
 
+    # git-send-email needs Net::SMTP::SSL
+    resource("Net::SMTP::SSL").stage do
+      (share/"perl5").install "lib/Net"
+    end
+
     # This is only created when building against system Perl, but it isn't
     # purged by Homebrew's post-install cleaner because that doesn't check
     # "Library" directories. It is however pointless to keep around as it
@@ -158,5 +169,14 @@ class Git < Formula
     system bin/"git", "add", "haunted", "house"
     system bin/"git", "commit", "-a", "-m", "Initial Commit"
     assert_equal "haunted\nhouse", shell_output("#{bin}/git ls-files").strip
+
+    # Check Net::SMTP::SSL was installed correctly.
+    %w[foo bar].each { |f| touch testpath/f }
+    system bin/"git", "add", "foo", "bar"
+    system bin/"git", "commit", "-a", "-m", "Second Commit"
+    assert_match "Authentication Required", shell_output(
+      "#{bin}/git send-email --to=dev@null.com --smtp-server=smtp.gmail.com " \
+      "--smtp-encryption=tls --confirm=never HEAD^ 2>&1", 255
+    )
   end
 end

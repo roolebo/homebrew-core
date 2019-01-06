@@ -3,15 +3,15 @@ class Fonttools < Formula
 
   desc "Library for manipulating fonts"
   homepage "https://github.com/fonttools/fonttools"
-  url "https://github.com/fonttools/fonttools/releases/download/3.33.0/fonttools-3.33.0.zip"
-  sha256 "f809b33c9124f6b06c9915bedb8c7a28c8201028e55546995e997937aaa1dea4"
+  url "https://github.com/fonttools/fonttools/releases/download/3.34.2/fonttools-3.34.2.zip"
+  sha256 "9fa6596ec04410dc75f2b9a5df9ca71abac85a7a5a8502f57cc72166a5401aaa"
   head "https://github.com/fonttools/fonttools.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "fd9a84e39a47954b7fe9b2f118ae9c4e2e79ea2a516d3c218fc0a2f7e5523d34" => :mojave
-    sha256 "ded0e0044b35c466a9b9ea330533a34e641bec15ed58705609f4ceddbf35381d" => :high_sierra
-    sha256 "bb1cdda627764f7310dd45757b5caea24d12fbfeb3474cc3832777af1d46ced4" => :sierra
+    sha256 "601bb5a56de8f3be85b661e7e3dcdb9721430a907e837eed9440679a41ef4c6b" => :mojave
+    sha256 "05e6fac3b310e8ccbefe121c0b15ec3888d4608d05ebe5ffa77079309a800b6b" => :high_sierra
+    sha256 "9d8034bf2aad9435ed0f2f12a3ea0cd59bfdd1ac59c54b546fd5c5a934111099" => :sierra
   end
 
   depends_on "python"

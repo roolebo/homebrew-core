@@ -3,19 +3,15 @@ class OpencvAT2 < Formula
   homepage "https://opencv.org/"
   url "https://github.com/opencv/opencv/archive/2.4.13.7.tar.gz"
   sha256 "192d903588ae2cdceab3d7dc5a5636b023132c8369f184ca89ccec0312ae33d0"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 "af0260a1f08b7b60ca8fb918b67bf628db9c46e9a8cf5a69629c50698eb735fe" => :mojave
-    sha256 "0dc985cebec39f2b7fe7db76043964b1466be907de832490ef195cdd5c6b50e5" => :high_sierra
-    sha256 "cfe1c8ebc835aab1057bdba10d4379ecf3676480c12132aa11629b8479b5d146" => :sierra
+    sha256 "6580055d021fcabea83a3d2878cba7a6a7851fd2463f769e98138a099b3cc82d" => :mojave
+    sha256 "3ac9fdae51aea0627c1febfc25b7dc99b6f3832684b7c0e044a46aac771e02ac" => :high_sierra
+    sha256 "055e15f3b20df7f4db64f2d540e1a19e044edad5b33eb1f5980f747126142b5b" => :sierra
   end
 
   keg_only :versioned_formula
-
-  option "without-python@2", "Build without python2 support"
-
-  deprecated_option "without-python" => "without-python@2"
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
@@ -24,9 +20,9 @@ class OpencvAT2 < Formula
   depends_on "jpeg"
   depends_on "libpng"
   depends_on "libtiff"
+  depends_on "numpy"
   depends_on "openexr"
-  depends_on "python@2" => :recommended
-  depends_on "numpy" if build.with? "python@2"
+  depends_on "python@2" # does not support Python 3
 
   def install
     jpeg = Formula["jpeg"]
@@ -42,6 +38,7 @@ class OpencvAT2 < Formula
       -DBUILD_TIFF=OFF
       -DBUILD_ZLIB=OFF
       -DBUILD_opencv_java=OFF
+      -DBUILD_opencv_python=ON
       -DWITH_CUDA=OFF
       -DWITH_EIGEN=ON
       -DWITH_FFMPEG=ON
@@ -54,18 +51,14 @@ class OpencvAT2 < Formula
       -DJPEG_LIBRARY=#{jpeg.opt_lib}/libjpeg.dylib
     ]
 
-    args << "-DBUILD_opencv_python=" + (build.with?("python@2") ? "ON" : "OFF")
+    py_prefix = `python-config --prefix`.chomp
+    py_lib = "#{py_prefix}/lib"
+    args << "-DPYTHON_LIBRARY=#{py_lib}/libpython2.7.dylib"
+    args << "-DPYTHON_INCLUDE_DIR=#{py_prefix}/include/python2.7"
 
-    if build.with? "python@2"
-      py_prefix = `python-config --prefix`.chomp
-      py_lib = "#{py_prefix}/lib"
-      args << "-DPYTHON_LIBRARY=#{py_lib}/libpython2.7.dylib"
-      args << "-DPYTHON_INCLUDE_DIR=#{py_prefix}/include/python2.7"
-
-      # Make sure find_program locates system Python
-      # https://github.com/Homebrew/homebrew-science/issues/2302
-      args << "-DCMAKE_PREFIX_PATH=#{py_prefix}"
-    end
+    # Make sure find_program locates system Python
+    # https://github.com/Homebrew/homebrew-science/issues/2302
+    args << "-DCMAKE_PREFIX_PATH=#{py_prefix}"
 
     if ENV.compiler == :clang && !build.bottle?
       args << "-DENABLE_SSSE3=ON" if Hardware::CPU.ssse3?
@@ -94,7 +87,7 @@ class OpencvAT2 < Formula
     assert_equal version.to_s, shell_output("./test").strip
 
     ENV["PYTHONPATH"] = lib/"python2.7/site-packages"
-    assert_match version.to_s,
-                 shell_output("python2.7 -c 'import cv2; print(cv2.__version__)'")
+    output = shell_output("python2.7 -c 'import cv2; print(cv2.__version__)'")
+    assert_match version.to_s, output
   end
 end

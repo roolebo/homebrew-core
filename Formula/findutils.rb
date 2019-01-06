@@ -6,16 +6,12 @@ class Findutils < Formula
   sha256 "ded4c9f73731cd48fec3b6bdaccce896473b6d8e337e9612e16cf1431bb1169d"
 
   bottle do
-    rebuild 2
-    sha256 "f7c4ad2d9948296b0b5af9e3dd7e02015fe20d64af9b7a479af76d07fb5c6059" => :mojave
-    sha256 "8411fd3a9a42a2be0c52b4ae8cad2dd60add473a4cf882620200ab43442fb5c2" => :high_sierra
-    sha256 "c1ecad1c780cb569d268ca5648570dcc753cca720ead2783943aea0363af728e" => :sierra
-    sha256 "bc20b7e2a97c3277ea13fd91b44fbc0015628e8684a2bba203c38a4c7357f6c7" => :el_capitan
+    cellar :any_skip_relocation
+    rebuild 3
+    sha256 "d0f28626392b25451b03772cce4fa33a8b087982a99640f56aa666db5fce250a" => :mojave
+    sha256 "9f3953da6f5e1ad0d21d12e557061dfdddb45424fa7ca6495772c781048bc6bc" => :high_sierra
+    sha256 "7c54d099f7ddf872fe22b6fa155ed31d80ab6c4e93735dfe25d4051a4abd1d30" => :sierra
   end
-
-  option "with-default-names", "Do not prepend 'g' to the binary"
-
-  deprecated_option "default-names" => "with-default-names"
 
   def install
     # Work around unremovable, nested dirs bug that affects lots of
@@ -31,29 +27,26 @@ class Findutils < Formula
       --localstatedir=#{var}/locate
       --disable-dependency-tracking
       --disable-debug
+      --program-prefix=g
     ]
-    args << "--program-prefix=g" if build.without? "default-names"
 
     system "./configure", *args
     system "make", "install"
 
     # https://savannah.gnu.org/bugs/index.php?46846
     # https://github.com/Homebrew/homebrew/issues/47791
-    updatedb = (build.with?("default-names") ? "updatedb" : "gupdatedb")
-    (libexec/"bin").install bin/updatedb
-    (bin/updatedb).write <<~EOS
+    (libexec/"bin").install bin/"gupdatedb"
+    (bin/"gupdatedb").write <<~EOS
       #!/bin/sh
       export LC_ALL='C'
-      exec "#{libexec}/bin/#{updatedb}" "$@"
+      exec "#{libexec}/bin/gupdatedb" "$@"
     EOS
 
-    if build.without? "default-names"
-      [[prefix, bin], [share, man/"*"]].each do |base, path|
-        Dir[path/"g*"].each do |p|
-          f = Pathname.new(p)
-          gnupath = "gnu" + f.relative_path_from(base).dirname
-          (libexec/gnupath).install_symlink f => f.basename.sub(/^g/, "")
-        end
+    [[prefix, bin], [share, man/"*"]].each do |base, path|
+      Dir[path/"g*"].each do |p|
+        f = Pathname.new(p)
+        gnupath = "gnu" + f.relative_path_from(base).dirname
+        (libexec/gnupath).install_symlink f => f.basename.sub(/^g/, "")
       end
     end
   end
@@ -62,28 +55,21 @@ class Findutils < Formula
     (var/"locate").mkpath
   end
 
-  def caveats
-    if build.without? "default-names"
-      <<~EOS
-        All commands have been installed with the prefix 'g'.
-        If you do not want the prefix, install using the "with-default-names" option.
+  def caveats; <<~EOS
+    All commands have been installed with the prefix "g".
+    If you need to use these commands with their normal names, you
+    can add a "gnubin" directory to your PATH from your bashrc like:
+      PATH="#{opt_libexec}/gnubin:$PATH"
 
-        If you need to use these commands with their normal names, you
-        can add a "gnubin" directory to your PATH from your bashrc like:
-
-            PATH="#{opt_libexec}/gnubin:$PATH"
-
-        Additionally, you can access their man pages with normal names if you add
-        the "gnuman" directory to your MANPATH from your bashrc as well:
-
-            MANPATH="#{opt_libexec}/gnuman:$MANPATH"
-      EOS
-    end
+    Additionally, you can access their man pages with normal names if you add
+    the "gnuman" directory to your MANPATH from your bashrc as well:
+      MANPATH="#{opt_libexec}/gnuman:$MANPATH"
+  EOS
   end
 
   test do
-    find = (build.with?("default-names") ? "find" : "gfind")
     touch "HOMEBREW"
-    assert_match "HOMEBREW", shell_output("#{bin}/#{find} .")
+    assert_match "HOMEBREW", shell_output("#{bin}/gfind .")
+    assert_match "HOMEBREW", shell_output("#{opt_libexec}/gnubin/find .")
   end
 end

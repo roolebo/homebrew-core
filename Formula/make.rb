@@ -7,48 +7,38 @@ class Make < Formula
   revision 1
 
   bottle do
-    rebuild 1
-    sha256 "3920fcf871d3ae443cac36fb1b83cdaddb4abb3b37c47a8808a9295571d27d20" => :mojave
-    sha256 "03431f1d344a6f474224d2a99f1d2c36ea1ff8b60ae0af3bcfbd73a3b53d6688" => :high_sierra
-    sha256 "98d5e65561d42e737713bd745110bf808800819a393e2ddb7743896203f92b56" => :sierra
+    rebuild 2
+    sha256 "77c4ba8e8b6d7ff0b8ea9b4cac2026882888196c2f39cdbdd004b92757a07ccf" => :mojave
+    sha256 "9486542a6ad3207c3f7e00c80f99a562014d6fc8aa833036c3927d11a6cee0ee" => :high_sierra
+    sha256 "8641015924620134cfa26c18eb665503950291d1110d72f876354242136cfa77" => :sierra
   end
-
-  option "with-default-names", "Do not prepend 'g' to the binary"
 
   def install
     args = %W[
       --disable-dependency-tracking
       --prefix=#{prefix}
+      --program-prefix=g
     ]
-
-    args << "--program-prefix=g" if build.without? "default-names"
 
     system "./configure", *args
     system "make", "install"
 
-    if build.without? "default-names"
-      (libexec/"gnubin").install_symlink bin/"gmake" =>"make"
-      (libexec/"gnuman/man1").install_symlink man1/"gmake.1" => "make.1"
-    end
+    (libexec/"gnubin").install_symlink bin/"gmake" =>"make"
+    (libexec/"gnuman/man1").install_symlink man1/"gmake.1" => "make.1"
   end
 
-  def caveats
-    if build.without? "default-names"
-      <<~EOS
-        All commands have been installed with the prefix 'g'.
-        If you do not want the prefix, install using the "with-default-names" option.
+  def caveats; <<~EOS
+    GNU "make" has been installed as "gmake".
+    If you need to use it as "make", you can add a "gnubin" directory
+    to your PATH from your bashrc like:
 
-        If you need to use these commands with their normal names, you
-        can add a "gnubin" directory to your PATH from your bashrc like:
+        PATH="#{opt_libexec}/gnubin:$PATH"
 
-            PATH="#{opt_libexec}/gnubin:$PATH"
+    Additionally, you can access its man page with normal name if you add
+    the "gnuman" directory to your MANPATH from your bashrc as well:
 
-        Additionally, you can access their man pages with normal names if you add
-        the "gnuman" directory to your MANPATH from your bashrc as well:
-
-            MANPATH="#{opt_libexec}/gnuman:$MANPATH"
-      EOS
-    end
+        MANPATH="#{opt_libexec}/gnuman:$MANPATH"
+  EOS
   end
 
   test do
@@ -57,9 +47,7 @@ class Make < Formula
       \t@echo Homebrew
     EOS
 
-    cmd = build.with?("default-names") ? "make" : "gmake"
-
-    assert_equal "Homebrew\n",
-      shell_output("#{bin}/#{cmd}")
+    assert_equal "Homebrew\n", shell_output("#{bin}/gmake")
+    assert_equal "Homebrew\n", shell_output("#{opt_libexec}/gnubin/make")
   end
 end

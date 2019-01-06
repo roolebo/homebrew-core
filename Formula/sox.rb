@@ -3,14 +3,14 @@ class Sox < Formula
   homepage "https://sox.sourceforge.io/"
   url "https://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.gz"
   sha256 "b45f598643ffbd8e363ff24d61166ccec4836fea6d3888881b8df53e3bb55f6c"
-  revision 1
+  revision 2
 
   bottle do
     cellar :any
-    sha256 "850cd95c4baea2d91467637582f120ab9eff066c7414847512ea9cf49ba218f1" => :mojave
-    sha256 "f1ba26233464499f58cc0cab34c5472d8b9e30a83cbc6e185b451a9476d560f4" => :high_sierra
-    sha256 "de9126013c1bbd7ec728197cc471231cf17c51e7620e995590b8a6ade6c07521" => :sierra
-    sha256 "f3b3ac24d351edb82fcd30119f13f6b86848c62b9130b6d20c8538e8b2b17d89" => :el_capitan
+    rebuild 1
+    sha256 "e0e0c4d0d52410e04179c4cdca1cd09c46451a282af6ebe7b8840e6b9aac4268" => :mojave
+    sha256 "5ba02bdd4b170dc35d5472399a705a13e2711e2e84af79c98b2b484e4acd05cc" => :high_sierra
+    sha256 "e7bd73d3b1f15ef439b2cba3cddaa74e3fad91747f2be1f66a551d6db1a61c49" => :sierra
   end
 
   depends_on "pkg-config" => :build
@@ -19,10 +19,7 @@ class Sox < Formula
   depends_on "libpng"
   depends_on "libvorbis"
   depends_on "mad"
-  depends_on "libao" => :optional
-  depends_on "libsndfile" => :optional
-  depends_on "opencore-amr" => :optional
-  depends_on "opusfile" => :optional
+  depends_on "opusfile"
 
   def install
     system "./configure", "--disable-debug",

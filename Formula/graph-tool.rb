@@ -5,11 +5,11 @@ class GraphTool < Formula
   homepage "https://graph-tool.skewed.de/"
   url "https://downloads.skewed.de/graph-tool/graph-tool-2.27.tar.bz2"
   sha256 "4740c69720dfbebf8fb3e77057b3e6a257ccf0432cdaf7345f873247390e4313"
-  revision 3
+  revision 4
 
   bottle do
-    sha256 "022b9cb44fa4886a90355116359451343739f09dc9d9a53fdf145b4763a5a40e" => :mojave
-    sha256 "22d56edc05fabf65cb0da4f771a8062357793fb56d8abb05330653cd2bf9feab" => :sierra
+    sha256 "7345b19af16c2bd6e75e2c4bc1a3b5d5f6edc3809c4500ab339d6f42c3bb6f73" => :mojave
+    sha256 "06bdf17e8bc4bcca3a184f4f857ef2f75808b170e416aa4365a5f045ad731534" => :sierra
   end
 
   depends_on "pkg-config" => :build
@@ -108,7 +108,7 @@ class GraphTool < Formula
 
   test do
     (testpath/"test.py").write <<~EOS
-      import graph_tool.all as gt
+      import graph_tool as gt
       g = gt.Graph()
       v1 = g.add_vertex()
       v2 = g.add_vertex()

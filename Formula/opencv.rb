@@ -1,14 +1,13 @@
 class Opencv < Formula
   desc "Open source computer vision library"
   homepage "https://opencv.org/"
-  url "https://github.com/opencv/opencv/archive/3.4.3.tar.gz"
-  sha256 "4eef85759d5450b183459ff216b4c0fa43e87a4f6aa92c8af649f89336f002ec"
-  revision 1
+  url "https://github.com/opencv/opencv/archive/4.0.1.tar.gz"
+  sha256 "7b86a0ee804244e0c407321f895b15e4a7162e9c5c0d2efc85f1cadec4011af4"
 
   bottle do
-    sha256 "401e09435895a9c643e8e43c6bd40f1a37de4b5178352af424242798f8da08e4" => :mojave
-    sha256 "2a8271e03b0950f269a5ffc52ec1feb7dc1a0906b5115a798c0a289a4631f765" => :high_sierra
-    sha256 "905f2df0ce4366e8bf98c702e4bcbb6a9d952ebb532de2166f0f95f28821f959" => :sierra
+    sha256 "73f03c0b70646230276817b41cb8b3901008cffd88350309b008d19285e4a7cf" => :mojave
+    sha256 "5c384dfe3fc7bfa405aac1e25dfc384afb2084030153b195c24581ddac1d39ec" => :high_sierra
+    sha256 "8fb8cf21b549e1f603fc108fd8fee886501a377692feb27f703a629217b47dc0" => :sierra
   end
 
   depends_on "cmake" => :build
@@ -25,8 +24,8 @@ class Opencv < Formula
   depends_on "tbb"
 
   resource "contrib" do
-    url "https://github.com/opencv/opencv_contrib/archive/3.4.3.tar.gz"
-    sha256 "6dfb51326f3dfeb659128df952edecd45683626a965aa4a8e1e9c970c40fb636"
+    url "https://github.com/opencv/opencv_contrib/archive/4.0.1.tar.gz"
+    sha256 "0d8acbad4b7074cfaafd906a7419c23629179d5e98894714402090b192ef8237"
   end
 
   needs :cxx11
@@ -62,6 +61,7 @@ class Opencv < Formula
       -DBUILD_opencv_text=OFF
       -DOPENCV_ENABLE_NONFREE=ON
       -DOPENCV_EXTRA_MODULES_PATH=#{buildpath}/opencv_contrib/modules
+      -DOPENCV_GENERATE_PKGCONFIG=ON
       -DWITH_1394=OFF
       -DWITH_CUDA=OFF
       -DWITH_EIGEN=ON
@@ -103,14 +103,15 @@ class Opencv < Formula
 
   test do
     (testpath/"test.cpp").write <<~EOS
-      #include <opencv/cv.h>
+      #include <opencv2/opencv.hpp>
       #include <iostream>
       int main() {
         std::cout << CV_VERSION << std::endl;
         return 0;
       }
     EOS
-    system ENV.cxx, "test.cpp", "-I#{include}", "-L#{lib}", "-o", "test"
+    system ENV.cxx, "-std=c++11", "test.cpp", "-I#{include}/opencv4",
+                    "-o", "test"
     assert_equal `./test`.strip, version.to_s
 
     ["python2.7", "python3"].each do |python|

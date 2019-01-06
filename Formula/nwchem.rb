@@ -4,13 +4,13 @@ class Nwchem < Formula
   url "https://github.com/nwchemgit/nwchem/releases/download/6.8.1-release/nwchem-6.8.1-release.revision-v6.8-133-ge032219-src.2018-06-14.tar.bz2"
   version "6.8.1"
   sha256 "23ce8241a5977a93d8224f66433851c81a08ad58a4c551858ae031485b095ab7"
-  revision 1
+  revision 3
 
   bottle do
     cellar :any
-    sha256 "3db49e1ea6cba6a285d6ac4218d3d2fac349e7a9df4c038aea40c62dc5f5c63a" => :mojave
-    sha256 "817200750f1d8713129b618cb9fd6560b2b29ac650144e6272ada18c0db6a7c4" => :high_sierra
-    sha256 "a911198a8eedbdc7d74fca77341244ef0132f8dba426255d9193aff2db4a7595" => :sierra
+    sha256 "c0f5d0352634c9bde0e9c4b8eaae85ebc957e81056494cd68de260835520a2b2" => :mojave
+    sha256 "5fc0cc1332f02f8562568796625ffcf2d1afb6d14f8704201a1290c394761989" => :high_sierra
+    sha256 "8708819edfa216328f490560a3d03450c8b02aa635cc657275cf0831cca2726d" => :sierra
   end
 
   depends_on "gcc" # for gfortran
