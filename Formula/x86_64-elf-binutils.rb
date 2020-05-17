@@ -13,9 +13,13 @@ class X8664ElfBinutils < Formula
 
   def install
     system "./configure", "--target=x86_64-elf",
-                          "--prefix=#{prefix}"
+                          "--prefix=#{prefix}",
+                          "--infodir=#{info}/x86_64-elf-binutils"
     system "make"
     system "make", "install"
+
+    # localization files may conflict with native tools
+    (share/"locale").rmtree
   end
 
   test do
