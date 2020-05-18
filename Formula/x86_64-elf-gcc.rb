@@ -19,11 +19,8 @@ class X8664ElfGcc < Formula
   def install
     mkdir "x86_64-elf-gcc-build" do
       system "../configure", "--target=x86_64-elf",
-                             "--enable-targets=all",
-                             "--enable-multilib",
                              "--prefix=#{prefix}",
                              "--without-isl",
-                             "--disable-werror",
                              "--without-headers",
                              "--with-as=#{Formula["x86_64-elf-binutils"].bin}/x86_64-elf-as",
                              "--with-ld=#{Formula["x86_64-elf-binutils"].bin}/x86_64-elf-ld",
