@@ -20,6 +20,7 @@ class X8664ElfGcc < Formula
     mkdir "x86_64-elf-gcc-build" do
       system "../configure", "--target=x86_64-elf",
                              "--prefix=#{prefix}",
+                             "--infodir=#{info}/x86_64-elf-gcc",
                              "--without-isl",
                              "--without-headers",
                              "--with-as=#{Formula["x86_64-elf-binutils"].bin}/x86_64-elf-as",
@@ -29,6 +30,11 @@ class X8664ElfGcc < Formula
       system "make", "install-gcc"
       system "make", "all-target-libgcc"
       system "make", "install-target-libgcc"
+
+      # localization files may conflict with native gcc
+      (share/"locale").rmtree
+      # FSF-related man pages may conflict with native gcc
+      (share/"man/man7").rmtree
     end
   end
 
